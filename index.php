@@ -30,7 +30,7 @@
     <!-- style css -->
     <link rel="stylesheet" href="./assets/css/style.css" />
 
-    <title>HUMG Booking</title>
+    <title>UTT Booking</title>
 </head>
 <body>
   <main>

@@ -414,19 +414,29 @@
             <!-- gán đường dẫn vào ảnh to đầu -->
             <img src="<?php echo $rowImg["path"]; ?>" alt="">
           </div>
+
+
           <?php 
               // duyệt nốt 4 ảnh còn lại
               for($i= 0 ; $i < 4 ; $i++){
                 $rowImg = mysqli_fetch_assoc($resultImg);
+
+                // --- SỬA Ở ĐÂY: Thêm kiểm tra, nếu hết ảnh (null) thì dừng luôn ---
+                if (!$rowImg) {
+                    break;
+                }
+                // ------------------------------------------------------------------
+
                 $rowImg["path"] = substr($rowImg["path"] , 1);
- 
           ?>
             <div class="hero__img__smalls">
-              <!-- gán đường dẫn 4 ảnh còn lại vào ảnh nhỏ -->
               <img src="<?php echo $rowImg["path"]; ?>" alt="">
             </div>
           <?php } ?>
         </div>
+
+
+
         <div class="hero__title">
           <div class="title__name">
             <h1><?php echo $rowKs["ten_khach_san"]; ?></h1>

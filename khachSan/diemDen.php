@@ -202,6 +202,27 @@
           ngơi ngắn hạn của khách đi máy bay
         </p>
       </div>
+      <div class="card">
+       <a href="index.php?chuyen_trang=timKhachSan&id=<?php $rowDd = mysqli_fetch_assoc($resultDd); echo $rowDd["id"]; ?>">
+          <img
+            src="./assets/img/6-overview.jpg" 
+            alt="Địa điểm mới"
+          />
+       </a>
+        <h3>
+            <?php 
+                // Kiểm tra xem có lấy được tên không, nếu hết dữ liệu thì báo
+                if($rowDd) {
+                    echo $rowDd["ten_dia_diem"]; 
+                } else {
+                    echo "Chưa có dữ liệu";
+                }
+            ?>
+        </h3>
+        <p>
+            Địa điểm du lịch hấp dẫn mới được khai thác tại Hà Nội.
+        </p>
+      </div>
     </section>
     <?php include "./includes/footer.php";  ?>
     <script></script>

@@ -96,10 +96,11 @@
            
             $sql = "SELECT * FROM `nguoi_dung`";
             $result = mysqli_query($conn, $sql);
+            $stt=1;
             while($row = mysqli_fetch_array($result)){
             ?>
             <tr>
-                <td><?php echo $row["id"] ?></td>
+                <td><?php echo $stt++ ?></td>
                 <td><?php echo $row["ten_dang_nhap"] ?></td>
                 <td><?php echo $row["ho_ten"] ?></td>
                 <td><?php echo $row["email"] ?></td>

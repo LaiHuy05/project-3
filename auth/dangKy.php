@@ -235,7 +235,7 @@ if (isset($_POST['sigup'])) {
         </div>
         <div class="form-section form-sigup-section">
           <div class="img-logo">
-            <img src="../assets/img/logo.png" alt="" />
+            <img src="../assets/img/logo-utt-border.png" alt="" />
           </div>
           <?php if (!empty($error)) : ?>
          <div class="error-message">

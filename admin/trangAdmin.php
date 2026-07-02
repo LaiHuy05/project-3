@@ -10,7 +10,7 @@ if (isset($_GET["page_layout"])) {
     case "dangXuat":
       session_unset();
       session_destroy();
-      header('location: login.php');
+      header('location: ../auth/dangNhap.php');
       break;
   }
 }
@@ -188,8 +188,8 @@ include("../includes/connect.php");
     <div class="khung-chua-hai">
       <div class="phan-tren">
         <form class="tim-kiem">
-          <input class="tim-kiem-mot" type="text" placeholder="Tìm kiếm..." />
-          <button class="tim-kiem-hai" type="submit">Tìm kiếm</button>
+          <!-- <input class="tim-kiem-mot" type="text" placeholder="Tìm kiếm..." />
+          <button class="tim-kiem-hai" type="submit">Tìm kiếm</button> -->
         </form>
         <div>
           <?php echo "<p class='xin-chao'>Xin chào " . $_SESSION["username"] . "</p>" ?>

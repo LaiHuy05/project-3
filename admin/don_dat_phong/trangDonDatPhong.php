@@ -94,10 +94,11 @@
             
             $sql = "SELECT ddp.*, nd.ho_ten FROM `don_dat_phong` ddp JOIN `nguoi_dung` nd ON ddp.nguoi_dung_id = nd.id";
             $result = mysqli_query($conn, $sql);
+            $stt=1;
             while ($row = mysqli_fetch_array($result)) {
             ?>
                 <tr>
-                    <td><?php echo $row["id"] ?></td>
+                    <td><?php echo $stt++?></td>
                     <td><?php echo $row["ho_ten"] ?></td>
                     <td><?php echo $row["ngay_nhan"] ?></td>
                     <td><?php echo $row["ngay_tra"] ?></td>

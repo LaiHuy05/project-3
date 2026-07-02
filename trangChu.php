@@ -243,12 +243,9 @@
         <div class="slide__main">
           <div class="slide__main__hero">
             <div class="slide__main__text">
-              <h1>Khách sạn THE LEGEND</h1>
+              <h1>Khách sạn THE King</h1>
               <h2>Hoàn Kiếm , Hà Nội</h2>
             </div>
-            <!-- <a href="index.php?chuyen_trang=khachSan&id=1" class="slide__main__icon">
-              <i class="fa-regular fa-bookmark"></i>
-            </a> -->
           </div>
           <button class="slide__main__prev">
             <i class="fa-solid fa-angle-left"></i>
@@ -267,26 +264,38 @@
             <?php 
                 $sqlKs = "select ks.* , dd.ten_dia_diem from khach_san ks join dia_diem dd on ks.dia_diem_id = dd.id";
                 $resultKs = mysqli_query($conn , $sqlKs);
-                $totalKs = mysqli_num_rows($resultKs);
-                for($i = 0 ; $i < 4 ;$i++  ){
-                  $rowKs = mysqli_fetch_assoc($resultKs);
-                    
+                
+                // Hiển thị 4 khách sạn đầu tiên bằng PHP thuần
+                $count_display = 0;
+                while($count_display < 4 && $rowKs = mysqli_fetch_assoc($resultKs)){
+                    $count_display++;
             ?>
             <div class="hotels__card">
                 <?php 
                   $sqlImg = "select * from anh_khach_san where khach_san_id = '$rowKs[id]' ";
                   $resultImg = mysqli_query($conn , $sqlImg);
+                  // Ảnh mặc định nếu không tìm thấy
+                  $pathImg = "./assets/img/no-image.png"; 
+
                   if(mysqli_num_rows($resultImg) > 0){
                       $rowImg = mysqli_fetch_assoc($resultImg); 
-                      // cắt chuỗi do đường dẫn của path nằm khác cấp file nên khi index.php của khách hàng truy cập -> sẽ phải bỏ bớt đường dẫn
-                      $rowImg["path"] = substr($rowImg["path"] , 1);
+                      
+                      // FIX LOGIC ẢNH: Xử lý mọi trường hợp đường dẫn
+                      if (isset($rowImg["path"]) && !empty($rowImg["path"])) {
+                          if (strpos($rowImg["path"], "uploads") !== false) {
+                              // Nếu có chữ uploads (ví dụ ../uploads/anh.jpg) -> Cắt lấy từ uploads trở đi
+                              $pathImg = "./" . strstr($rowImg["path"], "uploads");
+                          } else {
+                              // Nếu KHÔNG có chữ uploads (ví dụ anh.jpg) -> Thêm ./uploads/ vào trước
+                              $pathImg = "./uploads/" . $rowImg["path"];
+                          }
+                      }
                   }
-                  
                 ?>
               <a
                 class="hotels__card__img"
                 href="index.php?chuyen_trang=khachSan&id=<?php echo $rowKs["id"]; ?>"
-                ><img src="<?php echo $rowImg["path"]; ?>" alt=""/>
+                ><img src="<?php echo $pathImg; ?>" alt="Khách sạn" onerror="this.src='./assets/img/no-image.png'"/>
               </a>
               <h3 class="hotels__card__name"><?php echo $rowKs["ten_khach_san"]; ?></h3>
               <p class="hotels__card__location"><?php echo $rowKs["ten_dia_diem"]; ?> , Hà Nội</p>
@@ -333,19 +342,16 @@
     <script>
       // phần trượt slide
       const slideBox = document.querySelector(".slide__main");
-      // khởi tạo 2 biến là 2 nút bấm next và prev
       const slideNext = document.querySelector(".slide__main__next");
       const slidePrev = document.querySelector(".slide__main__prev");
-      const linkSlide = document.querySelector(".slide__main__icon");
       const textMain = document.querySelector(".slide__main h1");
       const textBot = document.querySelector(".slide__main h2");
 
-      // khởi tạo mảng chứa danh sách các đường dẫn ảnh để khi sự kiện click diễn ra thay đổi theo giá trị index của các phần tử trong mảng
       let listSlide = [
         {
-          name : "merry christmas",
+          name : "Happy New Year",
           location: "",        
-          img:"./assets/img/noel2.gif"
+          img:"./assets/img/anhtet1.gif"
         },
        
         <?php 
@@ -354,7 +360,6 @@
         
         if(mysqli_num_rows($resultKs2) > 0 ){
             while($rowKs2 = mysqli_fetch_assoc($resultKs2)){
-
         ?>
         {
           name: "<?php echo $rowKs2["ten_khach_san"];?>",
@@ -365,12 +370,20 @@
               $resultImg2 = mysqli_query($conn , $sqlImg2);
               if(mysqli_num_rows($resultImg2) > 0){
                 $rowImg2 = mysqli_fetch_assoc($resultImg2); 
-                $rowImg2 = mysqli_fetch_assoc($resultImg2); 
                 
-                $rowImg2["path"] = substr($rowImg2["path"] , 1);
-                echo $rowImg2["path"];
+                // FIX LOGIC ẢNH SLIDE
+                if (isset($rowImg2["path"]) && !empty($rowImg2["path"])) {
+                    if (strpos($rowImg2["path"], "uploads") !== false) {
+                         echo "./" . strstr($rowImg2["path"], "uploads");
+                    } else {
+                         echo "./uploads/" . $rowImg2["path"];
+                    }
+                } else {
+                    echo "./assets/img/no-image.png";
+                }
+              } else {
+                  echo "./assets/img/no-image.png";
               }
-              
           ?>",
         },
         <?php   
@@ -379,49 +392,36 @@
         ?>
       ];
 
-      // khởi tạo phần tử index ban đầu
       let currentIndex = 0;
 
-      // hàm hiển thị ảnh theo vị trí index được cung cấp thông qua 2 sự kiện của 2 nút bấm
       function showSlide(index) {
-        // thay đổi style của khối slideBox -> thuộc tính ảnh nền
-        slideBox.style.backgroundImage = `url(${listSlide[index].img})`;
-        textMain.innerText = listSlide[index].name;
-        textBot.innerText = listSlide[index].location;
-
-        // Kiểm tra disable nút
-        // trạng thái disabled của nút prev = true -> khi giá trị tham số index truyền vào = 0
+        if(listSlide[index]) {
+            slideBox.style.backgroundImage = `url(${listSlide[index].img})`;
+            textMain.innerText = listSlide[index].name;
+            textBot.innerText = listSlide[index].location;
+        }
         slidePrev.disabled = index === 0;
-        // trạng thái disabled của nút next = true -> giá trị tham số index truyền vào = kích thước của mảng - 1
         slideNext.disabled = index === listSlide.length - 1;
       }
 
-      // Gán sự kiện click nút next
       slideNext.addEventListener("click", () => {
-        // khi click vào nút next sự kiện diễn ra
-        // kiểm tra giá trị hiện tại của biến currentIndex phải nhỏ hơn kích thước của mảng - 1
         if (currentIndex < listSlide.length - 1) {
-          // tăng biến current index lên 1
           currentIndex++;
-          // gọi đến hàm hiển thị ảnh với giá trị current index mới được truyền vào
           showSlide(currentIndex);
         }
       });
-      // gán sự kiện click nút prev
       slidePrev.addEventListener("click", () => {
         if (currentIndex > 0) {
-          // giảm biến currenIndex đi 1
           currentIndex--;
-          // gọi đến hàm hiển thị ảnh với giá trị currentIndex mới được truyền vào
           showSlide(currentIndex);
         }
       });
 
-     
-      showSlide(currentIndex);
+      if(listSlide.length > 0) {
+        showSlide(currentIndex);
+      }
 
-
-      // phần xem thêm và ẩn bớt
+      // Phần JS xử lý Xem thêm / Ẩn bớt
       const xemThem = document.querySelector(".hotels__more");
       const anBot = document.querySelector(".hotels__less");
       const quanLyKhachSan = document.querySelector(".hotels__list");
@@ -431,9 +431,11 @@
         <?php 
         $sqlKs3 = "select ks.* , dd.ten_dia_diem from khach_san ks join dia_diem dd on ks.dia_diem_id = dd.id";
         $resultKs3 = mysqli_query($conn , $sqlKs3);
-        $totalKs3 = mysqli_num_rows($resultKs3);
-           for($index = 0 ; $index < 4 ;$index++  ){
-              $rowKs3 = mysqli_fetch_assoc($resultKs3);
+        
+        $count = 0;
+        // Dùng while thay for để tránh lỗi khi hết dữ liệu
+        while($count < 4 && $rowKs3 = mysqli_fetch_assoc($resultKs3)){
+            $count++;
         ?>
         {
           nameHotel: "<?php echo $rowKs3["ten_khach_san"]; ?>",
@@ -443,10 +445,19 @@
               $resultImg3 = mysqli_query($conn , $sqlImg3);
               if(mysqli_num_rows($resultImg3) > 0){
                 $rowImg3 = mysqli_fetch_assoc($resultImg3); 
-                $rowImg3["path"] = substr($rowImg3["path"] , 1);
-                echo $rowImg3["path"];
+                // FIX LOGIC ẢNH JS
+                if (isset($rowImg3["path"]) && !empty($rowImg3["path"])) {
+                    if (strpos($rowImg3["path"], "uploads") !== false) {
+                        echo "./" . strstr($rowImg3["path"], "uploads");
+                    } else {
+                        echo "./uploads/" . $rowImg3["path"];
+                    }
+                } else {
+                    echo "./assets/img/no-image.png";
+                }
+              } else {
+                  echo "./assets/img/no-image.png";
               }
-              
           ?>",
           locationHotel: "<?php echo $rowKs3["ten_dia_diem"]; ?> , Hà Nội",
           
@@ -459,27 +470,44 @@
         for (let index = 0; index < listHotels.length; index++) {
           quanLyKhachSan.innerHTML += `<div class="hotels__card">
                 <a class="hotels__card__img" href="${listHotels[index].hrefHotel}"
-                  ><img src=${listHotels[index].imgHotel} alt=""
+                  ><img src="${listHotels[index].imgHotel}" alt="Ảnh khách sạn" onerror="this.src='./assets/img/no-image.png'"
                 /></a>
                 <h3 class="hotels__card__name">${listHotels[index].nameHotel}</h3>
                 <p class="hotels__card__location">${listHotels[index].locationHotel}</p>
               </div>`;
         }
       }
+
       function themKhachSan() {
         listHotels.push(
           <?php 
-            for($index = 0 ; $index < 4 ;$index++  ){
-              $rowKs3 = mysqli_fetch_assoc($resultKs3);
+            // Tiếp tục lấy các khách sạn còn lại
+            $countMore = 0;
+            while($countMore < 4 && $rowKs3 = mysqli_fetch_assoc($resultKs3)){
+                $countMore++;
           ?>
           {
             nameHotel: "<?php echo $rowKs3["ten_khach_san"]; ?>",
             hrefHotel:"index.php?chuyen_trang=khachSan&id=<?php echo $rowKs3["id"]; ?>",
             imgHotel: "<?php 
-                $rowImg3 = mysqli_fetch_assoc($resultImg3); 
-                $rowImg3["path"] = substr($rowImg3["path"] , 1);
-                echo $rowImg3["path"];
-          ?>",
+                $sqlImg3 = "select * from anh_khach_san where khach_san_id = '$rowKs3[id]' ";
+                $resultImg3 = mysqli_query($conn , $sqlImg3);
+                if(mysqli_num_rows($resultImg3) > 0){
+                    $rowImg3 = mysqli_fetch_assoc($resultImg3); 
+                    // FIX LOGIC ẢNH JS LOAD THÊM
+                    if (isset($rowImg3["path"]) && !empty($rowImg3["path"])) {
+                        if (strpos($rowImg3["path"], "uploads") !== false) {
+                            echo "./" . strstr($rowImg3["path"], "uploads");
+                        } else {
+                            echo "./uploads/" . $rowImg3["path"];
+                        }
+                    } else {
+                        echo "./assets/img/no-image.png";
+                    }
+                } else {
+                    echo "./assets/img/no-image.png";
+                }
+            ?>",
             locationHotel: "<?php echo $rowKs3["ten_dia_diem"]; ?> , Hà Nội",
           },
           <?php } ?>
@@ -488,7 +516,9 @@
       }
 
       function xoaKhachSan() {
-        listHotels.splice(4, listHotels.length - 1);
+        if (listHotels.length > 4) {
+            listHotels.splice(4, listHotels.length - 4);
+        }
         hienThiKhachSan();
       }
 

@@ -1,4 +1,4 @@
- <?php
+<?php
     // kiểm tra dữ liệu trước khi vào trang
     if(!isset($_SESSION["hoTen"] , $_SESSION["vaiTro"]) || $_SESSION["vaiTro"] != "khach hang"){
          header("Location: ./auth/dangNhap.php");
@@ -175,6 +175,20 @@
         color: #333;
         background-color: #fff;
       }
+      
+      /* CSS cho phần chọn thanh toán */
+      .payment-options {
+          display: flex;
+          justify-content: space-around;
+          margin-bottom: 15px;
+          padding: 10px;
+          border: 1px dashed #666;
+          border-radius: 5px;
+      }
+      .payment-options label {
+          cursor: pointer;
+          font-weight: 500;
+      }
   </style>
 </head>
 <body>
@@ -230,15 +244,29 @@
              // tổng tiền nhân thêm số ngày đó vào
              $tongTien *= $dayAll;
              $tienHienThi = number_format($tongTien , 0 , ',' , '.');
-             echo "<h5>Tổng tiền : ".$tienHienThi." VND</h5>"; 
+             
+             // Gán ID cho thẻ h5 để JS cập nhật
+             echo "<h5 id='hienThiTongTien'>Tổng tiền : ".$tienHienThi." VND</h5>"; 
              
             ?>
-            <!-- khởi tạo form gửi đến trang thanh toán -->
             <form action="index.php?chuyen_trang=thanhToan" method="post">
-                <!--3 ô input kiểu hidden -> ẩn nhưng giá trị vẫn được gửi đi -> id của đơn đặt phòng này và tổng tiền cần thanh toán  -->
                 <input type="hidden" name="donDatPhongId" value="<?php echo $donDatPhongId; ?>">
-                <input type="hidden" name="tongTien" value="<?php echo $tongTien;?>">
+                
+                <input type="hidden" id="inputTongTien" name="tongTien" value="<?php echo $tongTien;?>">
+                
                 <input type="hidden" name="trangThai" value="da thanh toan">
+
+                <label>Tùy chọn thanh toán:</label>
+                <div class="payment-options">
+                    <label>
+                        <input type="radio" name="kieu_thanh_toan" value="100" checked onchange="capNhatGia(100)"> 
+                        Trả toàn bộ (100%)
+                    </label>
+                    <label>
+                        <input type="radio" name="kieu_thanh_toan" value="30" onchange="capNhatGia(30)"> 
+                        Cọc trước (30%)
+                    </label>
+                </div>
                 <label for="phuongThuc">Phương thức thanh toán</label>
                 <select name="phuongThuc" id="">
                   <option value="the">Thẻ</option>
@@ -253,5 +281,28 @@
      </div>
     </div>
     <?php include "./includes/footer.php";  ?>
+
+    <script>
+        // Lấy giá gốc từ PHP
+        const tongTienGoc = <?php echo $tongTien; ?>;
+
+        function capNhatGia(phanTram) {
+            // Tính số tiền cần trả
+            let tienCanTra = tongTienGoc * (phanTram / 100);
+            
+            // Format tiền sang dạng 1.000.000 (kiểu Việt Nam)
+            let tienFormat = new Intl.NumberFormat('vi-VN').format(tienCanTra);
+
+            // 1. Cập nhật chữ hiển thị trên màn hình
+            let noiDungHienThi = "Tổng tiền : " + tienFormat + " VND";
+            if (phanTram == 30) {
+                noiDungHienThi = "Tiền cọc (30%) : " + tienFormat + " VND";
+            }
+            document.getElementById('hienThiTongTien').innerText = noiDungHienThi;
+
+            // 2. Cập nhật giá trị trong input hidden để gửi sang trang thanhToan.php
+            document.getElementById('inputTongTien').value = tienCanTra;
+        }
+    </script>
   </body>
 </html>

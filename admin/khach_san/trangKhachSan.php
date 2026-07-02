@@ -155,7 +155,7 @@
                 <div class="noi-dung-khach-san">
                     <h3><?php echo $row["ten_khach_san"] ?></h3>
                     <p><?php echo $row["mo_ta"] ?></p>
-                    <span class="nhan-thong-tin"><?php echo $row["ten_dia_diem"] ?></span>
+                    <span class="nhan-thong-tin"><?php echo $row["ten_dia_diem"] ?></span> 
                     <span class="nhan-thong-tin"><?php echo $row["so_dien_thoai"] ?></span>
                     <span class="nhan-thong-tin"><?php echo $row["email"] ?></span>
                 </div>

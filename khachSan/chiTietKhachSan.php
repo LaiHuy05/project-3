@@ -407,12 +407,15 @@
               // lấy đường dẫn ảnh đầu tiên 
               $rowImg = mysqli_fetch_assoc($resultImg);
               // xóa bớt đường dẫn do đường dẫn lúc lưu và lúc lấy thừa 1 dấu chấm ở đầu
-              $rowImg["path"] = substr($rowImg["path"] , 1);
+              // Kiểm tra nếu ký tự đầu là dấu chấm (.) thì mới cắt
+            if (strpos($rowImg["path"], '.') === 0) {
+              $rowImg["path"] = substr($rowImg["path"], 1);
+              }
             }
           ?>
           <div class="hero__img__smalls hero__img__big">
             <!-- gán đường dẫn vào ảnh to đầu -->
-            <img src="<?php echo $rowImg["path"]; ?>" alt="">
+            <img src="<?php echo $rowImg["path"]; ?>" alt="lỗi">
           </div>
 
 
@@ -427,10 +430,12 @@
                 }
                 // ------------------------------------------------------------------
 
-                $rowImg["path"] = substr($rowImg["path"] , 1);
+                if (strpos($rowImg["path"], '.') === 0) {
+                  $rowImg["path"] = substr($rowImg["path"], 1);
+              }
           ?>
             <div class="hero__img__smalls">
-              <img src="<?php echo $rowImg["path"]; ?>" alt="">
+              <img src="<?php echo $rowImg["path"]; ?>" alt="lỗi">
             </div>
           <?php } ?>
         </div>

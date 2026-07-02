@@ -76,27 +76,40 @@
 
 <body>
 
-    <?php
-    
+<?php
     if (
-        !empty($_POST['ten-dang-nhap'])
-        && !empty($_POST['mat-khau']) && !empty($_POST['ho-ten'])
-        && !empty($_POST['email']) && !empty($_POST['sdt']) && !empty($_POST['dia-chi']) && !empty($_POST['vai-tro'])
+        !empty($_POST['ten-dang-nhap']) && 
+        !empty($_POST['mat-khau']) && 
+        !empty($_POST['nhac-lai-mat-khau']) && 
+        !empty($_POST['ho-ten']) && 
+        !empty($_POST['email']) && 
+        !empty($_POST['sdt']) && 
+        !empty($_POST['dia-chi']) && 
+        !empty($_POST['vai-tro'])
     ) {
         $tenDangNhap = $_POST['ten-dang-nhap'];
         $matKhau = $_POST['mat-khau'];
+        $nhaclaimatkhau = $_POST['nhac-lai-mat-khau'];
         $hoTen = $_POST['ho-ten'];
         $email = $_POST['email'];
         $sdt = $_POST['sdt'];
         $diaChi = $_POST['dia-chi'];
         $vaiTro = $_POST['vai-tro'];
-        $sql = "INSERT INTO `nguoi_dung`(`ten_dang_nhap`, `mat_khau`, `ho_ten`, `email`, `so_dien_thoai`, `dia_chi`, `vai_tro`) VALUES ('$tenDangNhap','$matKhau','$hoTen','$email','$sdt','$diaChi','$vaiTro')";
 
-        if (mysqli_query($conn, $sql)) {
-            header('Location: trangAdmin.php?page_layout=trangNguoiDung');
-            exit;
+        // Kiểm tra xem 2 mật khẩu nhập vào có giống nhau không
+        if ($matKhau !== $nhaclaimatkhau) {
+            echo '<p class="canh-bao">Lỗi: Mật khẩu nhắc lại không khớp!</p>';
         } else {
-            echo '<p class="canh-bao">Lỗi SQL: ' . mysqli_error($conn) . '</p>';
+            // Đã bỏ cột nhac-lai-mat-khau, giờ 7 cột khớp chuẩn với 7 giá trị
+            $sql = "INSERT INTO `nguoi_dung`(`ten_dang_nhap`, `mat_khau`, `ho_ten`, `email`, `so_dien_thoai`, `dia_chi`, `vai_tro`) 
+                    VALUES ('$tenDangNhap', '$matKhau', '$hoTen', '$email', '$sdt', '$diaChi', '$vaiTro')";
+
+            if (mysqli_query($conn, $sql)) {
+                header('Location: trangAdmin.php?page_layout=trangNguoiDung');
+                exit;
+            } else {
+                echo '<p class="canh-bao">Lỗi SQL: ' . mysqli_error($conn) . '</p>';
+            }
         }
     }
     ?>
@@ -114,6 +127,10 @@
                 <div class="nhom-bieu-mau">
                     <label class="nhan-bieu-mau">Mật khẩu</label>
                     <input type="password" name="mat-khau" class="o-nhap" placeholder="Mật khẩu">
+                </div>
+                <div class="nhom-bieu-mau">
+                    <label class="nhan-bieu-mau">  Nhac lai Mật khẩu</label>
+                    <input type="password" name="nhac-lai-mat-khau" class="o-nhap" placeholder=" Mật khẩu">
                 </div>
 
                 <div class="nhom-bieu-mau">

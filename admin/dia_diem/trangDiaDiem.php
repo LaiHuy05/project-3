@@ -93,10 +93,11 @@
             
             $sql = "SELECT * FROM `dia_diem`";
             $result = mysqli_query($conn, $sql);
+            $stt=1;
             while ($row = mysqli_fetch_array($result)) {
             ?>
                 <tr>
-                    <td><?php echo $row["id"] ?></td>
+                    <td><?php echo $stt++ ?></td>
                     <td><?php echo $row["ten_dia_diem"] ?></td>
                     <td>
                         <a class="nut-bam sua" href="trangAdmin.php?page_layout=capNhatDiaDiem&id=<?php echo $row["id"] ?>">
